@@ -35,16 +35,18 @@ namespace FA
         static void Main(string[] args)
         {
             List<State> FA = new List<State>();
-            Console.WriteLine("Please enter the states like: q0,q1,q2, ...");
+            Console.WriteLine("Please, Enter the states like ( q0,q1,q2, ...):");
             string[] Statenames = Console.ReadLine().Split(',');
             for(int i =0; i< Statenames.Length; i++)
             {
                 State temp = new State(Statenames[i]);
                 FA.Add(temp);
             }
-            Console.WriteLine("Please enter the alphabet like: a,b,c ....");
+            Console.WriteLine("Please, Enter the alphabet like (a,b,c, ...):");
             string[] Alphabet = Console.ReadLine().Split(',');
-            Console.WriteLine("Please enter how many rules you want to enter: ");
+            Console.WriteLine("Please, Enter the Final states like (q0,q1,q2, ...):");
+            string[] FinalStates = Console.ReadLine().Split(',');
+            Console.WriteLine("Please, Enter how many rules you want to enter: ");
             int n = int.Parse(Console.ReadLine());
             for(int i=0; i< n; i++)
             {
