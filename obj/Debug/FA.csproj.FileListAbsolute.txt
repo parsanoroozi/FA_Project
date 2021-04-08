@@ -1,0 +1,2 @@
+C:\Users\ASUS\source\repos\FA\FA\obj\Debug\FA.csprojAssemblyReference.cache
+C:\Users\ASUS\source\repos\FA\FA\obj\Debug\FA.csproj.CoreCompileInputs.cache
