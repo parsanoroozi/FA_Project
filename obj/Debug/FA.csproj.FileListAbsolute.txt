@@ -1,2 +1,9 @@
 C:\Users\ASUS\source\repos\FA\FA\obj\Debug\FA.csprojAssemblyReference.cache
 C:\Users\ASUS\source\repos\FA\FA\obj\Debug\FA.csproj.CoreCompileInputs.cache
+D:\code\C#\_TLA\FA_Project\bin\Debug\FA.exe.config
+D:\code\C#\_TLA\FA_Project\bin\Debug\FA.exe
+D:\code\C#\_TLA\FA_Project\bin\Debug\FA.pdb
+D:\code\C#\_TLA\FA_Project\obj\Debug\FA.csprojAssemblyReference.cache
+D:\code\C#\_TLA\FA_Project\obj\Debug\FA.csproj.CoreCompileInputs.cache
+D:\code\C#\_TLA\FA_Project\obj\Debug\FA.exe
+D:\code\C#\_TLA\FA_Project\obj\Debug\FA.pdb

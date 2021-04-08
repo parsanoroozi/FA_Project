@@ -35,7 +35,7 @@ namespace FA
         static void Main(string[] args)
         {
             List<State> FA = new List<State>();
-            Console.WriteLine("Please enter the states like: q0,q1,q2 ....");
+            Console.WriteLine("Please enter the states like: q0,q1,q2, ...");
             string[] Statenames = Console.ReadLine().Split(',');
             for(int i =0; i< Statenames.Length; i++)
             {
