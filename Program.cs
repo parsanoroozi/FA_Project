@@ -9,6 +9,7 @@ namespace FA
 {
     class State
     {
+        public static List<string> alphabets;
         public string name;
         public List<State> sources = new List<State>();
         public List<string> S_alphabet = new List<string>();
