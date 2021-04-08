@@ -48,7 +48,19 @@ namespace FA
     }
     class NFA
     {
-         
+
+        public bool IsAcceptByNFA(string input)
+        {
+
+        }
+        public DFA CreateEquivalentDFA()
+        {
+
+        }
+        public string findRegExp()
+        {
+
+        }
     }
     class DFA
     {
@@ -58,7 +70,14 @@ namespace FA
         {
             this.dfa = dfa;
         }
+        public bool IsAcceptByDFA(string input)
+        {
 
+        }
+        public static DFA MakeSimpleDFA(DFA FA)
+        {
+
+        }
     }
     class Program
     {
