@@ -29,7 +29,21 @@ namespace FA
         /// <param name="destination"></param>
         public void AddTransition(string key,State destination)
         {
-
+            List<State> temp;
+            bool keyExists = DTransitions.TryGetValue(key, out temp);
+            if (keyExists)
+            {
+                if (temp.Exists(x => x.name == destination.name)) ;//the transition already exist.
+                else//add new transition
+                {
+                    temp.Add(destination);
+                }
+            }
+            else
+            {
+                temp=new List<State>() {destination };
+                DTransitions.Add(key, temp);
+            }
         }
     }
     class NFA
@@ -78,6 +92,7 @@ namespace FA
                             {
                                 FA[j].destinations.Add(FA[t]);
                                 FA[j].D_alphabet.Add(token[2]);
+                                
                             }
                         }
                     }
