@@ -14,20 +14,20 @@ namespace FA
         public List<State> sources = new List<State>();
         public List<string> S_alphabet = new List<string>();
         Dictionary<string, List<State>> DTransitions;
-     //   public List<State> destinations = new List<State>();
-     //   public List<string> D_alphabet = new List<string>();
+        //   public List<State> destinations = new List<State>();
+        //   public List<string> D_alphabet = new List<string>();
 
         public State(string name)
         {
             this.name = name;
         }
-        
+
         /// <summary>
         /// for adding a transition from this state to others.
         /// </summary>
         /// <param name="key"></param>
         /// <param name="destination"></param>
-        public void AddTransition(string key,State destination)
+        public void AddTransition(string key, State destination)
         {
             List<State> temp;
             bool keyExists = DTransitions.TryGetValue(key, out temp);
@@ -41,14 +41,18 @@ namespace FA
             }
             else
             {
-                temp=new List<State>() {destination };
+                temp = new List<State>() { destination };
                 DTransitions.Add(key, temp);
             }
         }
     }
     class NFA
     {
-
+        public State initialState { get; private set; }
+        public NFA(State initialState)
+        {
+            this.initialState = initialState;
+        }
         public bool IsAcceptByNFA(string input)
         {
 
@@ -66,9 +70,11 @@ namespace FA
     {
         public List<State> dfa = new List<State>();
 
+
         public DFA(List<State> dfa)
         {
             this.dfa = dfa;
+
         }
         public bool IsAcceptByDFA(string input)
         {
@@ -111,7 +117,7 @@ namespace FA
                             {
                                 FA[j].destinations.Add(FA[t]);
                                 FA[j].D_alphabet.Add(token[2]);
-                                
+
                             }
                         }
                     }
