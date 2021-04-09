@@ -9,19 +9,17 @@ namespace FA
 {
     class State
     {
+        public bool isFinal;
+        public bool isInit;
         public static List<string> alphabets;
         public string name;
-        public List<State> sources = new List<State>();
-        public List<string> S_alphabet = new List<string>();
         Dictionary<string, List<State>> DTransitions;
-        //   public List<State> destinations = new List<State>();
-        //   public List<string> D_alphabet = new List<string>();
-
-        public State(string name)
+        public State(string name, bool isInit = false)
         {
             this.name = name;
+            this.isInit = isInit;
+            isFinal = false;
         }
-
         /// <summary>
         /// for adding a transition from this state to others.
         /// </summary>
@@ -30,14 +28,11 @@ namespace FA
         public void AddTransition(string key, State destination)
         {
             List<State> temp;
+
             bool keyExists = DTransitions.TryGetValue(key, out temp);
             if (keyExists)
             {
-                if (temp.Exists(x => x.name == destination.name)) ;//the transition already exist.
-                else//add new transition
-                {
-                    temp.Add(destination);
-                }
+                if (!temp.Exists(x => x.name == destination.name)) temp.Add(destination);
             }
             else
             {
@@ -48,12 +43,14 @@ namespace FA
     }
     class NFA
     {
-        public State initialState { get; private set; }
-        public NFA(State initialState)
+        public State initialState { get; set; }
+        public List<State> States;
+        public NFA(State initialState, List<State> states)
         {
             this.initialState = initialState;
+            this.States = states;
         }
-        public bool IsAcceptByNFA(string input)
+        virtual public bool IsAcceptByFA(string input)
         {
 
         }
@@ -66,17 +63,13 @@ namespace FA
 
         }
     }
-    class DFA
+    class DFA : NFA
     {
-        public List<State> dfa = new List<State>();
 
-
-        public DFA(List<State> dfa)
+        public DFA(State initialState, List<State> states) : base(initialState, states)
         {
-            this.dfa = dfa;
-
         }
-        public bool IsAcceptByDFA(string input)
+        override public bool IsAcceptByFA(string input)
         {
 
         }
@@ -89,47 +82,66 @@ namespace FA
     {
         static void Main(string[] args)
         {
-            List<State> FA = new List<State>();
+            List<State> states = new List<State>();
             Console.WriteLine("Please, Enter the states like ( q0,q1,q2, ...):");
             string[] Statenames = Console.ReadLine().Split(',');
             for (int i = 0; i < Statenames.Length; i++)
             {
-                State temp = new State(Statenames[i]);
-                FA.Add(temp);
+                if (i != 0)
+                {
+                    State temp = new State(Statenames[i]);
+                    states.Add(temp);
+                }
+                else
+                {
+                    State temp = new State(Statenames[i], true);
+                    states.Add(temp);
+                }
             }
             Console.WriteLine("Please, Enter the alphabet like (a,b,c, ...):");
-            string[] Alphabet = Console.ReadLine().Split(',');
+            State.alphabets = Console.ReadLine().Split(',').ToList();            
             Console.WriteLine("Please, Enter the Final states like (q0,q1,q2, ...):");
             string[] FinalStates = Console.ReadLine().Split(',');
+            for (int i = 0; i < FinalStates.Length; ++i)
+            {
+                for (int j = 0; j < states.Count; ++j)
+                {
+                    if (states[j].name == FinalStates[i])
+                    {
+                        states[j].isFinal = true;
+                        break;
+                    }
+                }
+            }
             Console.WriteLine("Please, Enter how many rules you want to enter: ");
             int n = int.Parse(Console.ReadLine());
             for (int i = 0; i < n; i++)
             {
                 string[] token = Console.ReadLine().Split(' ');
-                for (int j = 0; j < FA.Count; j++)
+                for (int j = 0; j < states.Count; j++)
                 {
                     // fill sources
-                    if (token[0] == FA[j].name)
+                    if (token[0] == states[j].name)
                     {
-                        for (int t = 0; t < FA.Count; t++)
+                        for (int t = 0; t < states.Count; t++)
                         {
-                            if (token[1] == FA[t].name)
+                            if (token[1] == states[t].name)
                             {
-                                FA[j].destinations.Add(FA[t]);
-                                FA[j].D_alphabet.Add(token[2]);
+                                states[j].destinations.Add(states[t]);
+                                states[j].D_alphabet.Add(token[2]);
 
                             }
                         }
                     }
                     //fill destinations
-                    if (token[1] == FA[j].name)
+                    if (token[1] == states[j].name)
                     {
-                        for (int t = 0; t < FA.Count; t++)
+                        for (int t = 0; t < states.Count; t++)
                         {
-                            if (token[0] == FA[t].name)
+                            if (token[0] == states[t].name)
                             {
-                                FA[j].sources.Add(FA[t]);
-                                FA[j].S_alphabet.Add(token[2]);
+                                states[j].sources.Add(states[t]);
+                                states[j].S_alphabet.Add(token[2]);
                             }
                         }
                     }
