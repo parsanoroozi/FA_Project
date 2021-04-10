@@ -53,7 +53,11 @@ namespace FA
         }
         virtual public bool IsAcceptByFA(string input)
         {
+            bool answer = false;
 
+
+
+            return answer;
         }
         public DFA CreateEquivalentDFA()
         {
@@ -131,6 +135,7 @@ namespace FA
             }
             Console.WriteLine("Please, Enter the alphabet like (a,b,c, ...):");
             State.alphabets = Console.ReadLine().Split(',').ToList();
+            State.alphabets.Add("");
             Console.WriteLine("Please, Enter the Final states like (q0,q1,q2, ...):");
             string[] FinalStates = Console.ReadLine().Split(',');
             for (int i = 0; i < FinalStates.Length; ++i)
@@ -153,7 +158,10 @@ namespace FA
                     if (states[j].name == token[0])
                         for (int t = 0; t < states.Count; t++)
                             if (states[t].name == token[1])
-                                states[j].AddTransition(token[2], states[t]);
+                                if (token.Length == 3)
+                                    states[j].AddTransition(token[2], states[t]);
+                                else
+                                    states[j].AddTransition("", states[t]);
             }
         }
     }
