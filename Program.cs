@@ -59,6 +59,17 @@ namespace FA
         {
 
         }
+        /// <summary>
+        /// Takes a state name and return the index of it in the states list.
+        /// </summary>
+        /// <param name="Name"></param>
+        /// <returns></returns>
+        int FindStateNumber(string Name)
+        {
+            int temp;
+            temp = States.FindIndex(x => x.name == Name);
+            return temp;
+        }
         public string findRegExp()
         {
 
