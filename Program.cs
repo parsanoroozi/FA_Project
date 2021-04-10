@@ -13,7 +13,7 @@ namespace FA
         public bool isInit;
         public static List<string> alphabets;
         public string name;
-        Dictionary<string, List<State>> DTransitions;
+        public Dictionary<string, List<State>> DTransitions;
         public State(string name, bool isInit = false)
         {
             this.name = name;
@@ -71,7 +71,7 @@ namespace FA
         }
         override public bool IsAcceptByFA(string input)
         {
-
+            
         }
         public static DFA MakeSimpleDFA(DFA FA)
         {
