@@ -93,6 +93,10 @@ namespace FA
         {
 
         }
+        public void ShowSchematicDFA()
+        {
+
+        }
     }
     class Program
     {
