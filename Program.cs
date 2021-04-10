@@ -99,7 +99,7 @@ namespace FA
                 }
             }
             Console.WriteLine("Please, Enter the alphabet like (a,b,c, ...):");
-            State.alphabets = Console.ReadLine().Split(',').ToList();            
+            State.alphabets = Console.ReadLine().Split(',').ToList();
             Console.WriteLine("Please, Enter the Final states like (q0,q1,q2, ...):");
             string[] FinalStates = Console.ReadLine().Split(',');
             for (int i = 0; i < FinalStates.Length; ++i)
@@ -119,36 +119,10 @@ namespace FA
             {
                 string[] token = Console.ReadLine().Split(' ');
                 for (int j = 0; j < states.Count; j++)
-                {
-                    // fill sources
-                    if (token[0] == states[j].name)
-                    {
+                    if (states[j].name == token[0])
                         for (int t = 0; t < states.Count; t++)
-                        {
-                            if (token[1] == states[t].name)
-                            {
-                                states[j].destinations.Add(states[t]);
-                                states[j].D_alphabet.Add(token[2]);
-
-                            }
-                        }
-                    }
-                    //fill destinations
-                    if (token[1] == states[j].name)
-                    {
-                        for (int t = 0; t < states.Count; t++)
-                        {
-                            if (token[0] == states[t].name)
-                            {
-                                states[j].sources.Add(states[t]);
-                                states[j].S_alphabet.Add(token[2]);
-                            }
-                        }
-                    }
-                }
-
-
-
+                            if (states[t].name == token[1])
+                                states[j].AddTransition(token[2], states[t]);
             }
         }
     }
