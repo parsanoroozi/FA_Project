@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -71,7 +72,22 @@ namespace FA
         }
         override public bool IsAcceptByFA(string input)
         {
-            
+            bool answer = true;
+            State temp = States[0];
+
+            for (int i = 0; i < input.Length; i++)
+            {
+                List<State> tempList;
+                if (temp.DTransitions.TryGetValue(input[i].ToString(), out tempList))
+                    temp = tempList[0];
+                else
+                    return false;
+            }
+            if (!temp.isFinal)
+                return false;
+
+            return answer;
+
         }
         public static DFA MakeSimpleDFA(DFA FA)
         {
