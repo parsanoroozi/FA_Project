@@ -65,8 +65,8 @@ namespace FA
         }
         public DFA CreateEquivalentDFA()
         {
-           int t=  FindStateNumber(initialState.name);
-            List<State> DFAStates=new List<State>() { new State("") ,new State(Math.Pow(2,t).ToString(),true)};
+            int t = FindStateNumber(initialState.name);
+            List<State> DFAStates = new List<State>() { new State(""), new State(Math.Pow(2, t).ToString(), true) };
 
 
         }
@@ -119,20 +119,53 @@ namespace FA
         public void ShowSchematicDFA()
         {
             Graph Dfa = new Graph("DFA");
-           // AddInitNode(Dfa,);
+            foreach (State s in this.States)
+            {
+                if (s.isInit)
+                {
+                    AddInitNode(Dfa, s.name, s.isFinal);
+                }
+                else
+                {
+                    AddCNode(Dfa, s.name, s.isFinal);
+                }
+            }
+            // AddInitNode(Dfa,);
         }
 
-        private void AddInitNode(Graph graph,string nodeName)
+        private void AddInitNode(Graph graph, string nodeName, bool IsFinal = false)
         {
             Node init = new Node(nodeName);
-            init.Attr.FillColor =Color.LawnGreen ;
+            init.Attr.FillColor = Color.LavenderBlush;
             init.Attr.Shape = Shape.Triangle;
+            if (IsFinal)
+            {
+                init.Attr.AddStyle(Style.Bold);
+                init.Attr.FillColor = Color.PowderBlue;
+            }               
+            
             init.Attr.XRadius = 4;
-            init.Attr.YRadius = 4; 
+            init.Attr.YRadius = 4;
             init.Attr.LineWidth = 10;
 
 
-            graph.AddNode(init) ;
+            graph.AddNode(init);
+        }
+        private void AddCNode(Graph graph, string nodeName, bool IsFinal = false)
+        {
+            Node nod = new Node(nodeName);
+            nod.Attr.FillColor = Color.Honeydew;
+            nod.Attr.Shape = Shape.Circle;
+            if (IsFinal)
+            {
+                nod.Attr.Shape = Shape.DoubleCircle;
+                nod.Attr.AddStyle(Style.Bold);
+                nod.Attr.FillColor = Color.PowderBlue;
+            }
+            nod.Attr.XRadius = 5;
+            nod.Attr.YRadius = 5;
+            nod.Attr.LineWidth = 10;
+            graph.AddNode(nod);
         }
     }
     class Program
@@ -180,7 +213,7 @@ namespace FA
                     if (states[j].name == token[0])
                         for (int t = 0; t < states.Count; t++)
                             if (states[t].name == token[1])
-                                    states[j].AddTransition(token[2], states[t]);
+                                states[j].AddTransition(token[2], states[t]);
             }
 
             /*NFA nfa = new NFA(states[0], states);
