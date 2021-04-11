@@ -130,7 +130,14 @@ namespace FA
                     AddCNode(Dfa, s.name, s.isFinal);
                 }
             }
-            // AddInitNode(Dfa,);
+            foreach(State s in this.States)
+            {
+                foreach(string L in s.DTransitions.Keys)
+                {
+                    s.DTransitions[L].ForEach((x) => { Dfa.AddEdge(s.name, L, x.name); });
+                }
+            }
+
         }
 
         private void AddInitNode(Graph graph, string nodeName, bool IsFinal = false)
