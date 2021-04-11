@@ -5,6 +5,8 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Msagl;
+using Microsoft.Msagl.Splines;
 
 namespace FA
 {
@@ -57,8 +59,12 @@ namespace FA
         }
         public DFA CreateEquivalentDFA()
         {
+           int t=  FindStateNumber(initialState.name);
+            List<State> DFAStates=new List<State>() { new State("") ,new State(Math.Pow(2,t).ToString(),true)};
+
 
         }
+
         /// <summary>
         /// Takes a state name and return the index of it in the states list.
         /// </summary>
