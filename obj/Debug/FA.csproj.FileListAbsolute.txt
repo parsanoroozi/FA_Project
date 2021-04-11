@@ -7,3 +7,7 @@ D:\code\C#\_TLA\FA_Project\obj\Debug\FA.csprojAssemblyReference.cache
 D:\code\C#\_TLA\FA_Project\obj\Debug\FA.csproj.CoreCompileInputs.cache
 D:\code\C#\_TLA\FA_Project\obj\Debug\FA.exe
 D:\code\C#\_TLA\FA_Project\obj\Debug\FA.pdb
+C:\Users\ASUS\Desktop\university\FA\FA_Project\obj\Debug\FA.csprojAssemblyReference.cache
+C:\Users\ASUS\Desktop\university\FA\FA_Project\obj\Debug\FA.csproj.CoreCompileInputs.cache
+C:\Users\ASUS\Desktop\university\FA\FA_Project\obj\Debug\FA.exe
+C:\Users\ASUS\Desktop\university\FA\FA_Project\obj\Debug\FA.pdb
