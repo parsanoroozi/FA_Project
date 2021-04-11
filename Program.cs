@@ -16,7 +16,7 @@ namespace FA
         public bool isInit;
         public static List<string> alphabets;
         public string name;
-        public Dictionary<string, List<State>> DTransitions;
+        public Dictionary<string, List<State>> DTransitions = new Dictionary<string, List<State>>();
         public State(string name, bool isInit = false)
         {
             this.name = name;
