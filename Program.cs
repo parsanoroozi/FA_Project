@@ -159,7 +159,7 @@ namespace FA
             int n = int.Parse(Console.ReadLine());
             for (int i = 0; i < n; i++)
             {
-                string[] token = Console.ReadLine().Split(' ');
+                string[] token = Console.ReadLine().Split(',');
                 for (int j = 0; j < states.Count; j++)
                     if (states[j].name == token[0])
                         for (int t = 0; t < states.Count; t++)
