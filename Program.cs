@@ -164,10 +164,7 @@ namespace FA
                     if (states[j].name == token[0])
                         for (int t = 0; t < states.Count; t++)
                             if (states[t].name == token[1])
-                                if (token.Length == 3)
                                     states[j].AddTransition(token[2], states[t]);
-                                else
-                                    states[j].AddTransition("", states[t]);
             }
         }
     }
