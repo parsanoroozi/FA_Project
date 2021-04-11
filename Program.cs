@@ -6,7 +6,9 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Msagl;
+using Microsoft.Msagl.Drawing;
 using Microsoft.Msagl.Splines;
+using System.Windows;
 
 namespace FA
 {
@@ -116,7 +118,21 @@ namespace FA
         }
         public void ShowSchematicDFA()
         {
+            Graph Dfa = new Graph("DFA");
+           // AddInitNode(Dfa,);
+        }
 
+        private void AddInitNode(Graph graph,string nodeName)
+        {
+            Node init = new Node(nodeName);
+            init.Attr.FillColor =Color.LawnGreen ;
+            init.Attr.Shape = Shape.Triangle;
+            init.Attr.XRadius = 4;
+            init.Attr.YRadius = 4; 
+            init.Attr.LineWidth = 10;
+
+
+            graph.AddNode(init) ;
         }
     }
     class Program
