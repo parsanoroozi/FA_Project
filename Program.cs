@@ -182,6 +182,25 @@ namespace FA
                             if (states[t].name == token[1])
                                     states[j].AddTransition(token[2], states[t]);
             }
+
+            /*NFA nfa = new NFA(states[0], states);
+            Console.WriteLine();
+            Console.WriteLine("Alphabet : ");
+
+            foreach (var i in State.alphabets)
+                Console.WriteLine(i);
+
+            Console.WriteLine("States: ");
+            for (int i = 0; i < nfa.States.Count; i++)
+            {
+                Console.WriteLine($"name: {nfa.States[i].name}   isinitial: {nfa.States[i].isInit}    isfinal: {nfa.States[i].isFinal}");
+                foreach (var j in nfa.States[i].DTransitions)
+                    foreach (var t in j.Value)
+                        Console.WriteLine($"source: {nfa.States[i].name}  alphabet: {j.Key}  destination: {t.name}");
+                Console.WriteLine();
+            }*/
+
+
         }
     }
 }
