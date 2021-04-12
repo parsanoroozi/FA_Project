@@ -60,11 +60,39 @@ namespace FA
         }
         virtual public bool IsAcceptByFA(string input)
         {
-            bool answer = false;
-
-
-
-            return answer;
+            List<State> finallist = new List<State>();
+            finallist.Add(States[0]);
+            int num_of_visiteds;
+            for (int i = 0; i < input.Length; i++)
+            {
+                List<State> tempList;
+                for (int t = 0; t < finallist.Count; t++)
+                    if (finallist[t].DTransitions.TryGetValue("", out tempList))
+                    {
+                        for (int j = 0; j < tempList.Count; j++)
+                            finallist.Add(tempList[j]);
+                    }
+                List<int> indexes = new List<int>();
+                num_of_visiteds = finallist.Count;
+                for (int j = 0; j < num_of_visiteds; j++)
+                {
+                    if (finallist[j].DTransitions.TryGetValue(input[i].ToString(), out tempList))
+                    {
+                        for (int t = 0; t < tempList.Count; t++)
+                            finallist.Add(tempList[t]);
+                    }
+                    else
+                        indexes.Add(j);
+                }
+                for (int j = 0; j < indexes.Count; j++)
+                    finallist.RemoveAt(indexes[j]);
+                for (int j = 0; j < num_of_visiteds - indexes.Count; j++)
+                    finallist.RemoveAt(0);
+            }
+            for (int i = 0; i < finallist.Count; i++)
+                if (finallist[i].isFinal)
+                    return true;
+            return false;
         }
         public DFA CreateEquivalentDFA()
         {
