@@ -15,20 +15,36 @@ using System.Windows.Forms;
 
 namespace FA
 {
+    class BackTransition
+    {
+        public State back;
+        public string transition;
+        public BackTransition(State back, string tran)
+        {
+            this.back = back;
+            this.transition = tran;
+        }
+    }
     class State
     {
         public bool isFinal;
         public bool isInit;
         public static List<string> alphabets;
         public string name;
+
+        public List<BackTransition> backTransitions;
+        /// <summary>
+        /// forward transitions to other states
+        /// </summary>
         public Dictionary<string, List<State>> DTransitions = new Dictionary<string, List<State>>();
         public State(string name, bool isInit = false)
         {
             this.name = name;
             this.isInit = isInit;
             isFinal = false;
+            backTransitions = new List<BackTransition>();
         }
-        
+
         /// <summary>
         /// for adding a transition from this state to others.
         /// </summary>
@@ -57,14 +73,16 @@ namespace FA
         /// </summary>
         public string Regex { get; private set; }
 
-        public RegexState(State state) : base(state.name)
+        public RegexState(State state) : base(state.name, isInit: state.isInit)
         {
+            this.backTransitions =
             this.Regex = "";
             FindThisRegex();
         }
+        List<BackTransition>
         private void FindThisRegex()
         {
-            
+
         }
 
         /// <summary>
