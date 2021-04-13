@@ -28,6 +28,7 @@ namespace FA
             this.isInit = isInit;
             isFinal = false;
         }
+        
         /// <summary>
         /// for adding a transition from this state to others.
         /// </summary>
@@ -48,6 +49,41 @@ namespace FA
                 DTransitions.Add(key, temp);
             }
         }
+    }
+    class RegexState : State
+    {
+        /// <summary>
+        /// The regular expression this state produces
+        /// </summary>
+        public string Regex { get; private set; }
+
+        public RegexState(State state) : base(state.name)
+        {
+            this.Regex = "";
+            FindThisRegex();
+        }
+        private void FindThisRegex()
+        {
+            
+        }
+
+        /// <summary>
+        /// add a part to this states Regex.
+        /// </summary>
+        /// <param name="x">The part to be added</param>
+        public void AddToThisRegex(string x)
+        {
+            if (x == "") return;
+            if (this.Regex == "")
+            {
+                Regex = $"({x})*";
+            }
+            else
+            {
+                Regex = $"({Regex} + ({x}))*";
+            }
+        }
+
     }
     class NFA
     {
