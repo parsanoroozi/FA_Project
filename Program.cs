@@ -81,6 +81,8 @@ namespace FA
     class RegexState : State
     {
         static RegexState initial;
+        static RegexState UnitedFinal;
+        static List<RegexState> AllStates = new List<RegexState>();
         /// <summary>
         /// The regular expression this state produces
         /// </summary>
@@ -91,15 +93,76 @@ namespace FA
             this.backTransitions = state.backTransitions;
             this.DTransitions = state.DTransitions;
             this.Regex = "";
+            if (state.isFinal)//add a lambda expression to final state
+            {
+                this.AddTransition("", RegexState.UnitedFinal);
+            }
             FindSelfLoops();
+            if (this.isInit == true)
+            {
+                RegexState.initial = this;
+            }
+            RegexState.AllStates.Add(this);
         }
-        
-        
-        private void FindSelfLoops()
+        public void DeleteStates()
         {
-            
+            for (int i = 0; i < RegexState.AllStates.Count; i++)
+            {
+                // RegexState.AllStates[i];
+                if (RegexState.AllStates[i].isInit == false)
+                {
+                    foreach (var B in RegexState.AllStates[i].backTransitions)
+                    {
+                        string BString =B.transition+this.Regex;
+                        var Q = B.back;
+                        var find = B.back.DTransitions[B.transition].Find(x => x.State.name == this.name );                       
+                        find.isDeleted = true;                        
+                        foreach( var key in this.DTransitions.Keys)
+                        {
+                            var li = DTransitions[key];
+                            for (int j = 0; j < li.Count; ++j)
+                            {
+                                if (li[j].isDeleted == false)
+                                {
+                                    li[j].isDeleted = true;
+                                    if (Q.name != li[j].State.name)
+                                    {
+                                        Q.AddTransition(BString + key, li[j].State);
+                                    }
+                                    else
+                                    {
+                                        RegexState.AllStates.Find(x => x.name == Q.name).AddToThisRegex(BString + key);
+                                    }
+                                }
+                            }
+
+                        }
+
+                    }
+
+
+                }
+
+            }
+        }
+        public void Reset()//reset the DTransitions isDelete to false;
+        {
+
         }
 
+        private void FindSelfLoops()
+        {
+            foreach (string k in this.DTransitions.Keys)
+            {
+                var Tlist = DTransitions[k];
+                var find = Tlist.FindAll(x => x.isDeleted == false && x.State.name == this.name);
+                if (find.Count != 0)
+                {
+                    find.ForEach(x => x.isDeleted = true);
+                    this.AddToThisRegex(k);
+                }
+            }
+        }
         /// <summary>
         /// add a part to this states Regex.
         /// </summary>
@@ -241,7 +304,7 @@ namespace FA
             {
                 foreach (string L in s.DTransitions.Keys)
                 {
-                    s.DTransitions[L].ForEach((x) => { Dfa.AddEdge(s.name, L, x.name); });
+                    s.DTransitions[L].ForEach((x) => { Dfa.AddEdge(s.name, L, x.State.name); });
                 }
             }
             viewer.Graph = Dfa;
