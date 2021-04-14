@@ -80,7 +80,7 @@ namespace FA
     }
     class RegexState : State
     {
-
+        static RegexState initial;
         /// <summary>
         /// The regular expression this state produces
         /// </summary>
@@ -91,11 +91,11 @@ namespace FA
             this.backTransitions = state.backTransitions;
             this.DTransitions = state.DTransitions;
             this.Regex = "";
-            FindThisRegex();
+            FindSelfLoops();
         }
         
         
-        private void FindThisRegex()
+        private void FindSelfLoops()
         {
             
         }
@@ -134,12 +134,12 @@ namespace FA
             int num_of_visiteds;
             for (int i = 0; i < input.Length; i++)
             {
-                List<State> tempList;
+                List<DeletableTransition> tempList;
                 for (int t = 0; t < finallist.Count; t++)
                     if (finallist[t].DTransitions.TryGetValue("", out tempList))
                     {
                         for (int j = 0; j < tempList.Count; j++)
-                            finallist.Add(tempList[j]);
+                            finallist.Add(tempList[j].State);
                     }
                 List<int> indexes = new List<int>();
                 num_of_visiteds = finallist.Count;
@@ -148,7 +148,7 @@ namespace FA
                     if (finallist[j].DTransitions.TryGetValue(input[i].ToString(), out tempList))
                     {
                         for (int t = 0; t < tempList.Count; t++)
-                            finallist.Add(tempList[t]);
+                            finallist.Add(tempList[t].State);
                     }
                     else
                         indexes.Add(j);
@@ -200,9 +200,9 @@ namespace FA
 
             for (int i = 0; i < input.Length; i++)
             {
-                List<State> tempList;
+                List<DeletableTransition> tempList;
                 if (temp.DTransitions.TryGetValue(input[i].ToString(), out tempList))
-                    temp = tempList[0];
+                    temp = tempList[0].State;
                 else
                     return false;
             }
