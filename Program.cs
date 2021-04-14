@@ -111,7 +111,7 @@ namespace FA
             }
             RegexState.AllStates.Add(this);
         }
-        public void DeleteStates()
+        public static void DeleteStates()
         {
             for (int i = 0; i < RegexState.AllStates.Count; i++)
             {
@@ -120,13 +120,13 @@ namespace FA
                 {
                     foreach (var B in RegexState.AllStates[i].backTransitions)
                     {
-                        string BString = B.transition + this.selfRegex;
+                        string BString = B.transition + RegexState.AllStates[i].selfRegex;
                         var Q = B.back;
-                        var find = B.back.DTransitions[B.transition].Find(x => x.State.name == this.name);
+                        var find = B.back.DTransitions[B.transition].Find(x => x.State.name == RegexState.AllStates[i].name);
                         find.isDeleted = true;
-                        foreach (var key in this.DTransitions.Keys)
+                        foreach (var key in RegexState.AllStates[i].DTransitions.Keys)
                         {
-                            var li = DTransitions[key];
+                            var li = RegexState.AllStates[i]. DTransitions[key];
                             for (int j = 0; j < li.Count; ++j)
                             {
                                 if (li[j].isDeleted == false)
@@ -167,7 +167,7 @@ namespace FA
         /// <summary>
         /// reset the DTransitions isDelete to false;
         /// </summary>
-        public void Reset() 
+        public static void Reset() 
         {
             int n = AllStates.Count;
             for (int i = n - 1; i >= 0; ++i)
@@ -286,7 +286,15 @@ namespace FA
         }
         public string findRegExp()
         {
-
+            RegexState.Regex = "";
+            foreach(var s in this.States)
+            {                
+                new RegexState(s);
+            }
+            RegexState.DeleteStates();
+            string reg = RegexState.Regex;
+            RegexState.Reset();
+            return reg;
         }
     }
     class DFA : NFA
