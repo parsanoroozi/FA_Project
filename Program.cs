@@ -80,19 +80,26 @@ namespace FA
     }
     class RegexState : State
     {
+
         static RegexState initial;
         static RegexState UnitedFinal;
         static List<RegexState> AllStates = new List<RegexState>();
+        public static string Regex = "";
         /// <summary>
-        /// The regular expression this state produces
+        /// The regular expression this state's self loop produces.
         /// </summary>
-        public string Regex { get; private set; }
+        public string selfRegex { get; private set; }
 
         public RegexState(State state) : base(state.name, isInit: state.isInit)
         {
+            if (UnitedFinal == null)
+            {
+                UnitedFinal = new RegexState(new State("FinalState"));
+                UnitedFinal.isFinal = true;
+            }
             this.backTransitions = state.backTransitions;
             this.DTransitions = state.DTransitions;
-            this.Regex = "";
+            this.selfRegex = "";
             if (state.isFinal)//add a lambda expression to final state
             {
                 this.AddTransition("", RegexState.UnitedFinal);
@@ -113,11 +120,11 @@ namespace FA
                 {
                     foreach (var B in RegexState.AllStates[i].backTransitions)
                     {
-                        string BString =B.transition+this.Regex;
+                        string BString = B.transition + this.selfRegex;
                         var Q = B.back;
-                        var find = B.back.DTransitions[B.transition].Find(x => x.State.name == this.name );                       
-                        find.isDeleted = true;                        
-                        foreach( var key in this.DTransitions.Keys)
+                        var find = B.back.DTransitions[B.transition].Find(x => x.State.name == this.name);
+                        find.isDeleted = true;
+                        foreach (var key in this.DTransitions.Keys)
                         {
                             var li = DTransitions[key];
                             for (int j = 0; j < li.Count; ++j)
@@ -135,19 +142,51 @@ namespace FA
                                     }
                                 }
                             }
-
                         }
-
                     }
-
-
+                }
+            }
+            foreach (var key in RegexState.initial.DTransitions.Keys)
+            {
+                string BString = initial.selfRegex;
+                var lis = initial.DTransitions[key];
+                for (int i = 0; i < lis.Count; ++i)
+                {
+                    if (lis[i].isDeleted == false && lis[i].State.isFinal == true)
+                    {
+                        if (Regex != "")
+                            Regex += "+" + BString + key;
+                        else
+                        {
+                            Regex += BString + key;
+                        }
+                    }
+                }
+            }
+        }
+        /// <summary>
+        /// reset the DTransitions isDelete to false;
+        /// </summary>
+        public void Reset() 
+        {
+            int n = AllStates.Count;
+            for (int i = n - 1; i >= 0; ++i)
+            {
+                var keys= AllStates[i].DTransitions.Keys;
+                foreach(var st in keys)
+                {
+                    if (alphabets.Contains(st) == false)
+                    {
+                        AllStates[i].DTransitions.Remove(st);
+                    }
+                    else
+                    {
+                        AllStates[i].DTransitions[st].ForEach(x => x.isDeleted = false);
+                    }
                 }
 
             }
-        }
-        public void Reset()//reset the DTransitions isDelete to false;
-        {
-
+            AllStates.RemoveAll(x=>true);
         }
 
         private void FindSelfLoops()
@@ -170,13 +209,13 @@ namespace FA
         public void AddToThisRegex(string x)
         {
             if (x == "") return;
-            if (this.Regex == "")
+            if (this.selfRegex == "")
             {
-                Regex = $"({x})*";
+                selfRegex = $"({x})*";
             }
             else
             {
-                Regex = $"({Regex} + ({x}))*";
+                selfRegex = $"({selfRegex} + ({x}))*";
             }
         }
 
