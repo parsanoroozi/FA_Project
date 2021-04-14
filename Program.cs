@@ -296,37 +296,7 @@ namespace FA
             RegexState.Reset();
             return reg;
         }
-    }
-    class DFA : NFA
-    {
-
-        public DFA(State initialState, List<State> states) : base(initialState, states)
-        {
-        }
-        override public bool IsAcceptByFA(string input)
-        {
-            bool answer = true;
-            State temp = States[0];
-
-            for (int i = 0; i < input.Length; i++)
-            {
-                List<DeletableTransition> tempList;
-                if (temp.DTransitions.TryGetValue(input[i].ToString(), out tempList))
-                    temp = tempList[0].State;
-                else
-                    return false;
-            }
-            if (!temp.isFinal)
-                return false;
-
-            return answer;
-
-        }
-        public static DFA MakeSimpleDFA(DFA FA)
-        {
-
-        }
-        public void ShowSchematicDFA()
+        public void ShowSchematicFA()
         {
             WindowsFormsHost GraphView = new WindowsFormsHost();
             //create a form
@@ -362,7 +332,6 @@ namespace FA
             ///show the form
             form.ShowDialog();
         }
-
         private void AddInitNode(Graph graph, string nodeName, bool IsFinal = false, State s = null)
         {
             Microsoft.Msagl.Drawing.Node init = new Microsoft.Msagl.Drawing.Node(nodeName);
@@ -408,6 +377,37 @@ namespace FA
             }
             graph.AddNode(nod);
         }
+    }
+    class DFA : NFA
+    {
+
+        public DFA(State initialState, List<State> states) : base(initialState, states)
+        {
+        }
+        override public bool IsAcceptByFA(string input)
+        {
+            bool answer = true;
+            State temp = States[0];
+
+            for (int i = 0; i < input.Length; i++)
+            {
+                List<DeletableTransition> tempList;
+                if (temp.DTransitions.TryGetValue(input[i].ToString(), out tempList))
+                    temp = tempList[0].State;
+                else
+                    return false;
+            }
+            if (!temp.isFinal)
+                return false;
+
+            return answer;
+
+        }
+        public static DFA MakeSimpleDFA(DFA FA)
+        {
+
+        }
+       
     }
     class Program
     {
