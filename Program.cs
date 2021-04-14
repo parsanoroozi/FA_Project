@@ -15,6 +15,16 @@ using System.Windows.Forms;
 
 namespace FA
 {
+    class DeletableTransition
+    {
+        public bool isDeleted;
+        public State State;
+        public DeletableTransition(State state, bool isdeleted = false)
+        {
+            this.isDeleted = isdeleted;
+            this.State = state;
+        }
+    }
     class BackTransition
     {
         public State back;
@@ -31,12 +41,11 @@ namespace FA
         public bool isInit;
         public static List<string> alphabets;
         public string name;
-
         public List<BackTransition> backTransitions;
         /// <summary>
         /// forward transitions to other states
         /// </summary>
-        public Dictionary<string, List<State>> DTransitions = new Dictionary<string, List<State>>();
+        public Dictionary<string, List<DeletableTransition>> DTransitions = new Dictionary<string, List<DeletableTransition>>();
         public State(string name, bool isInit = false)
         {
             this.name = name;
@@ -44,7 +53,6 @@ namespace FA
             isFinal = false;
             backTransitions = new List<BackTransition>();
         }
-
         /// <summary>
         /// for adding a transition from this state to others.
         /// </summary>
@@ -52,22 +60,27 @@ namespace FA
         /// <param name="destination"></param>
         public void AddTransition(string key, State destination)
         {
-            List<State> temp;
+            List<DeletableTransition> temp;
 
+            if (!destination.backTransitions.Exists(x => x.back.name == this.name && x.transition == key))//add back trasition to destination
+            {
+                destination.backTransitions.Add(new BackTransition(this, key));
+            }
             bool keyExists = DTransitions.TryGetValue(key, out temp);
             if (keyExists)
             {
-                if (!temp.Exists(x => x.name == destination.name)) temp.Add(destination);
+                if (!temp.Exists(x => x.State.name == destination.name)) temp.Add(new DeletableTransition(destination));
             }
             else
             {
-                temp = new List<State>() { destination };
+                temp = new List<DeletableTransition>() { new DeletableTransition(destination) };
                 DTransitions.Add(key, temp);
             }
         }
     }
     class RegexState : State
     {
+
         /// <summary>
         /// The regular expression this state produces
         /// </summary>
@@ -75,14 +88,16 @@ namespace FA
 
         public RegexState(State state) : base(state.name, isInit: state.isInit)
         {
-            this.backTransitions =
+            this.backTransitions = state.backTransitions;
+            this.DTransitions = state.DTransitions;
             this.Regex = "";
             FindThisRegex();
         }
-        List<BackTransition>
+        
+        
         private void FindThisRegex()
         {
-
+            
         }
 
         /// <summary>
