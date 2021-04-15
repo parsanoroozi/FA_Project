@@ -15,18 +15,43 @@ using System.Windows.Forms;
 
 namespace FA
 {
+    class DeletableTransition
+    {
+        public bool isDeleted;
+        public State State;
+        public DeletableTransition(State state, bool isdeleted = false)
+        {
+            this.isDeleted = isdeleted;
+            this.State = state;
+        }
+    }
+    class BackTransition
+    {
+        public State back;
+        public string transition;
+        public BackTransition(State back, string tran)
+        {
+            this.back = back;
+            this.transition = tran;
+        }
+    }
     class State
     {
         public bool isFinal;
         public bool isInit;
         public static List<string> alphabets;
         public string name;
-        public Dictionary<string, List<State>> DTransitions = new Dictionary<string, List<State>>();
+        public List<BackTransition> backTransitions;
+        /// <summary>
+        /// forward transitions to other states
+        /// </summary>
+        public Dictionary<string, List<DeletableTransition>> DTransitions = new Dictionary<string, List<DeletableTransition>>();
         public State(string name, bool isInit = false)
         {
             this.name = name;
             this.isInit = isInit;
             isFinal = false;
+            backTransitions = new List<BackTransition>();
         }
         /// <summary>
         /// for adding a transition from this state to others.
@@ -35,19 +60,165 @@ namespace FA
         /// <param name="destination"></param>
         public void AddTransition(string key, State destination)
         {
-            List<State> temp;
+            List<DeletableTransition> temp;
 
+            if (!destination.backTransitions.Exists(x => x.back.name == this.name && x.transition == key))//add back trasition to destination
+            {
+                destination.backTransitions.Add(new BackTransition(this, key));
+            }
             bool keyExists = DTransitions.TryGetValue(key, out temp);
             if (keyExists)
             {
-                if (!temp.Exists(x => x.name == destination.name)) temp.Add(destination);
+                if (!temp.Exists(x => x.State.name == destination.name)) temp.Add(new DeletableTransition(destination));
             }
             else
             {
-                temp = new List<State>() { destination };
+                temp = new List<DeletableTransition>() { new DeletableTransition(destination) };
                 DTransitions.Add(key, temp);
             }
         }
+    }
+    class RegexState : State
+    {
+
+        static RegexState initial;
+        static RegexState UnitedFinal;
+        static List<RegexState> AllStates = new List<RegexState>();
+        public static string Regex = "";
+        /// <summary>
+        /// The regular expression this state's self loop produces.
+        /// </summary>
+        public string selfRegex { get; private set; }
+
+        public RegexState(State state) : base(state.name, isInit: state.isInit)
+        {
+            if (UnitedFinal == null)
+            {
+                UnitedFinal = new RegexState(new State("FinalState"));
+                UnitedFinal.isFinal = true;
+            }
+            this.backTransitions = state.backTransitions;
+            this.DTransitions = state.DTransitions;
+            this.selfRegex = "";
+            if (state.isFinal)//add a lambda expression to final state
+            {
+                this.AddTransition("", RegexState.UnitedFinal);
+            }
+            FindSelfLoops();
+            if (this.isInit == true)
+            {
+                RegexState.initial = this;
+            }
+            RegexState.AllStates.Add(this);
+        }
+        public static void DeleteStates()
+        {
+            for (int i = 0; i < RegexState.AllStates.Count; i++)
+            {
+                // RegexState.AllStates[i];
+                if (RegexState.AllStates[i].isInit == false)
+                {
+                    foreach (var B in RegexState.AllStates[i].backTransitions)
+                    {
+                        string BString = B.transition + RegexState.AllStates[i].selfRegex;
+                        var Q = B.back;
+                        var find = B.back.DTransitions[B.transition].Find(x => x.State.name == RegexState.AllStates[i].name);
+                        find.isDeleted = true;
+                        foreach (var key in RegexState.AllStates[i].DTransitions.Keys)
+                        {
+                            var li = RegexState.AllStates[i]. DTransitions[key];
+                            for (int j = 0; j < li.Count; ++j)
+                            {
+                                if (li[j].isDeleted == false)
+                                {
+                                    li[j].isDeleted = true;
+                                    if (Q.name != li[j].State.name)
+                                    {
+                                        Q.AddTransition(BString + key, li[j].State);
+                                    }
+                                    else
+                                    {
+                                        RegexState.AllStates.Find(x => x.name == Q.name).AddToThisRegex(BString + key);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            foreach (var key in RegexState.initial.DTransitions.Keys)
+            {
+                string BString = initial.selfRegex;
+                var lis = initial.DTransitions[key];
+                for (int i = 0; i < lis.Count; ++i)
+                {
+                    if (lis[i].isDeleted == false && lis[i].State.isFinal == true)
+                    {
+                        if (Regex != "")
+                            Regex += "+" + BString + key;
+                        else
+                        {
+                            Regex += BString + key;
+                        }
+                    }
+                }
+            }
+        }
+        /// <summary>
+        /// reset the DTransitions isDelete to false;
+        /// </summary>
+        public static void Reset() 
+        {
+            int n = AllStates.Count;
+            for (int i = n - 1; i >= 0; ++i)
+            {
+                var keys= AllStates[i].DTransitions.Keys;
+                foreach(var st in keys)
+                {
+                    if (alphabets.Contains(st) == false)
+                    {
+                        AllStates[i].DTransitions.Remove(st);
+                    }
+                    else
+                    {
+                        AllStates[i].DTransitions[st].ForEach(x => x.isDeleted = false);
+                    }
+                }
+
+            }
+            AllStates.RemoveAll(x=>true);
+        }
+
+        private void FindSelfLoops()
+        {
+            foreach (string k in this.DTransitions.Keys)
+            {
+                var Tlist = DTransitions[k];
+                var find = Tlist.FindAll(x => x.isDeleted == false && x.State.name == this.name);
+                if (find.Count != 0)
+                {
+                    find.ForEach(x => x.isDeleted = true);
+                    this.AddToThisRegex(k);
+                }
+            }
+        }
+        /// <summary>
+        /// add a part to this states Regex.
+        /// </summary>
+        /// <param name="x">The part to be added</param>
+        public void AddToThisRegex(string x)
+        {
+            if (x == "") return;
+            if (this.selfRegex == "")
+            {
+                selfRegex = $"({x})*";
+            }
+            else
+            {
+                selfRegex = $"({selfRegex} + ({x}))*";
+            }
+        }
+
     }
     class NFA
     {
@@ -65,12 +236,12 @@ namespace FA
             int num_of_visiteds;
             for (int i = 0; i < input.Length; i++)
             {
-                List<State> tempList;
+                List<DeletableTransition> tempList;
                 for (int t = 0; t < finallist.Count; t++)
                     if (finallist[t].DTransitions.TryGetValue("", out tempList))
                     {
                         for (int j = 0; j < tempList.Count; j++)
-                            finallist.Add(tempList[j]);
+                            finallist.Add(tempList[j].State);
                     }
                 List<int> indexes = new List<int>();
                 num_of_visiteds = finallist.Count;
@@ -79,7 +250,7 @@ namespace FA
                     if (finallist[j].DTransitions.TryGetValue(input[i].ToString(), out tempList))
                     {
                         for (int t = 0; t < tempList.Count; t++)
-                            finallist.Add(tempList[t]);
+                            finallist.Add(tempList[t].State);
                     }
                     else
                         indexes.Add(j);
@@ -115,39 +286,17 @@ namespace FA
         }
         public string findRegExp()
         {
-
-        }
-    }
-    class DFA : NFA
-    {
-
-        public DFA(State initialState, List<State> states) : base(initialState, states)
-        {
-        }
-        override public bool IsAcceptByFA(string input)
-        {
-            bool answer = true;
-            State temp = States[0];
-
-            for (int i = 0; i < input.Length; i++)
-            {
-                List<State> tempList;
-                if (temp.DTransitions.TryGetValue(input[i].ToString(), out tempList))
-                    temp = tempList[0];
-                else
-                    return false;
+            RegexState.Regex = "";
+            foreach(var s in this.States)
+            {                
+                new RegexState(s);
             }
-            if (!temp.isFinal)
-                return false;
-
-            return answer;
-
+            RegexState.DeleteStates();
+            string reg = RegexState.Regex;
+            RegexState.Reset();
+            return reg;
         }
-        public static DFA MakeSimpleDFA(DFA FA)
-        {
-
-        }
-        public void ShowSchematicDFA()
+        public void ShowSchematicFA()
         {
             WindowsFormsHost GraphView = new WindowsFormsHost();
             //create a form
@@ -172,7 +321,7 @@ namespace FA
             {
                 foreach (string L in s.DTransitions.Keys)
                 {
-                    s.DTransitions[L].ForEach((x) => { Dfa.AddEdge(s.name, L, x.name); });
+                    s.DTransitions[L].ForEach((x) => { Dfa.AddEdge(s.name, L, x.State.name); });
                 }
             }
             viewer.Graph = Dfa;
@@ -183,7 +332,6 @@ namespace FA
             ///show the form
             form.ShowDialog();
         }
-
         private void AddInitNode(Graph graph, string nodeName, bool IsFinal = false, State s = null)
         {
             Microsoft.Msagl.Drawing.Node init = new Microsoft.Msagl.Drawing.Node(nodeName);
@@ -229,6 +377,37 @@ namespace FA
             }
             graph.AddNode(nod);
         }
+    }
+    class DFA : NFA
+    {
+
+        public DFA(State initialState, List<State> states) : base(initialState, states)
+        {
+        }
+        override public bool IsAcceptByFA(string input)
+        {
+            bool answer = true;
+            State temp = States[0];
+
+            for (int i = 0; i < input.Length; i++)
+            {
+                List<DeletableTransition> tempList;
+                if (temp.DTransitions.TryGetValue(input[i].ToString(), out tempList))
+                    temp = tempList[0].State;
+                else
+                    return false;
+            }
+            if (!temp.isFinal)
+                return false;
+
+            return answer;
+
+        }
+        public static DFA MakeSimpleDFA(DFA FA)
+        {
+
+        }
+       
     }
     class Program
     {
