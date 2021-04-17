@@ -77,6 +77,67 @@ namespace FA
                 DTransitions.Add(key, temp);
             }
         }
+
+        public State Merge(State s, NFA TempNfa)
+        {
+            State merged = new State(this.name + s.name);
+            DeletableTransition MERGED = new DeletableTransition(merged);
+            if (this.isInit || s.isInit)
+                merged.isInit = true;
+            if (this.isFinal || s.isFinal)
+                merged.isFinal = true;
+            if (this.DTransitions.TryGetValue("", out List<DeletableTransition> value))
+                for (int i = 0; i < value.Count; i++)
+                    if (value[i].State.name == s.name || value[i].State.name == this.name)
+                        value.RemoveAt(i);
+            if (s.DTransitions.TryGetValue("", out List<DeletableTransition> value1))
+                for (int i = 0; i < value1.Count; i++)
+                    if (value1[i].State.name == this.name || value1[i].State.name == s.name)
+                        value.RemoveAt(i);
+            for (int i = 0; i < State.alphabets.Count; i++)
+            {
+                List<DeletableTransition> temp = new List<DeletableTransition>();
+                if (this.DTransitions.TryGetValue(State.alphabets[i], out value))
+                {
+                    for (int j = 0; j < value.Count; j++)
+                    {
+                        temp.Add(value[j]);
+                    }
+                }
+                if (s.DTransitions.TryGetValue(State.alphabets[i], out value1))
+                {
+                    for (int j = 0; j < value1.Count; j++)
+                    {
+                        temp.Add(value1[j]);
+                    }
+                }
+                merged.DTransitions.Add(State.alphabets[i], temp);
+            }
+
+            for (int i = 0; i < TempNfa.States.Count; i++)
+                for (int j = 0; j < State.alphabets.Count; j++)
+                    if (TempNfa.States[i].DTransitions.TryGetValue(State.alphabets[j], out value))
+                        for (int t = 0; t < value.Count; t++)
+                            if (value[t].State.name == this.name || value[t].State.name == s.name)
+                            {
+                                value.RemoveAt(t);
+                                value.Add(MERGED);
+                            }
+            return merged;
+        }
+    }
+    class ConvertionalState
+    {
+        public bool isFinal;
+        public bool isInit;
+        public List<State> name;
+        public Dictionary<string, string> DTransitions = new Dictionary<string, string>();
+        public ConvertionalState(List<State> name, bool isInit = false)
+        {
+            this.name = name;
+            this.isInit = isInit;
+            isFinal = false;
+        }
     }
     class RegexState : State
     {
@@ -265,14 +326,137 @@ namespace FA
                     return true;
             return false;
         }
+        public NFA RemoveLambda()
+        {
+            NFA TempNfa = this;
+            for (int i = 0; i < TempNfa.States.Count; i++)
+            {
+                if (TempNfa.States[i].DTransitions.TryGetValue("", out List<DeletableTransition> value))
+                {
+                    for (int j = 0; j < value.Count; j++)
+                    {
+                        State statete_to_remove = value[j].State;
+                        TempNfa.States[i] = TempNfa.States[i].Merge(value[j].State, TempNfa);
+
+                        for (int t = 0; t < TempNfa.States.Count; t++)
+                        {
+                            if (TempNfa.States[t].name == statete_to_remove.name)
+                            {
+                                TempNfa.States.RemoveAt(t);
+                                i = 0;
+                            }
+                        }
+                    }
+                }
+            }
+            return new NFA(TempNfa.States[0], TempNfa.States);
+        }
         public DFA CreateEquivalentDFA()
         {
-            int t = FindStateNumber(initialState.name);
-            List<State> DFAStates = new List<State>() { new State(""), new State(Math.Pow(2, t).ToString(), true) };
+            NFA TEMP = this.RemoveLambda();
+            List<ConvertionalState> table = new List<ConvertionalState>();
+            State trap = new State("trap");
+            TEMP.States.Add(trap);
+            ConvertionalState Trap = new ConvertionalState(new List<State>() { trap });
+            for (int i = 0; i < State.alphabets.Count; i++)
+                Trap.DTransitions.Add(State.alphabets[i], trap.name);
+            List<State> name = new List<State>() { TEMP.initialState };
+
+            table.Add(new ConvertionalState(name, true));
+            for (int i = 0; i < table.Count; i++)
+            {
+                for (int j = 0; j < State.alphabets.Count; j++)
+                {
+                    List<State> transition = new List<State>();
+                    for (int t = 0; t < table[i].name.Count; t++)
+                    {
+                        if (table[i].name[t].DTransitions.TryGetValue(State.alphabets[j], out List<DeletableTransition> value))
+                        {
+                            for (int z = 0; z < value.Count; z++)
+                                transition.Add(value[z].State);
+                        }
+                    }
+                    if (transition.Count == 0)
+                    {
+                        table[i].DTransitions.Add(State.alphabets[j], trap.name);
+                    }
+                    else
+                    {
+                        string Name = "";
+                        for (int t = 0; t < transition.Count; t++)
+                            Name += transition[t].name;
+                        table[i].DTransitions.Add(State.alphabets[j], Name);
+                    }
+                    bool flag = false;
+                    string Value = "";
+                    if (table[i].DTransitions.TryGetValue(State.alphabets[j], out Value))
+                    {
+                        if (Value.Length != 0)
+                        {
+                            for (int t = 0; t < table.Count; t++)
+                            {
+                                string tempname = "";
+                                for (int z = 0; z < table[t].name.Count; z++)
+                                    tempname += table[t].name[z].name;
+                                if (tempname == Value)
+                                {
+                                    flag = true;
+                                    break;
+                                }
+                            }
+                        }
+
+                    }
+
+                    if (!flag && transition.Count != 0)
+                        table.Add(new ConvertionalState(transition));
+                }
+            }
+            List<State> dfa = new List<State>();
+            for (int i = 0; i < table.Count; i++)
+            {
+                bool finalSt = false;
+                string NAME = "";
+                for (int j = 0; j < table[i].name.Count; j++)
+                {
+                    NAME += table[i].name[j].name;
+                    if (table[i].name[j].isFinal)
+                        finalSt = true;
+                }
+                if (i == 0)
+                    dfa.Add(new State(NAME, true));
+                else
+                    dfa.Add(new State(NAME));
+                dfa[dfa.Count - 1].isFinal = finalSt;
+
+            }
+
+            for (int i = 0; i < table.Count; i++)
+                for (int j = 0; j < State.alphabets.Count; j++)
+                    for (int t = 0; t < dfa.Count; t++)
+                        if (table[i].DTransitions.TryGetValue(State.alphabets[j], out string value))
+                            if (dfa[t].name == value)
+                            {
+                                DeletableTransition tempp = new DeletableTransition(dfa[t]);
+                                dfa[i].DTransitions.Add(State.alphabets[j], new List<DeletableTransition>() { tempp });
+                            }
 
 
+            DFA ReDfa = new DFA(dfa[0], dfa);
+
+            for (int i = 0; i < ReDfa.States.Count; i++)
+            {
+                for (int j = 0; j < State.alphabets.Count - 1; j++)
+                {
+                    if (!ReDfa.States[i].DTransitions.TryGetValue(State.alphabets[j], out List<DeletableTransition> value))
+                    {
+                        DeletableTransition tempp = new DeletableTransition(trap);
+                        ReDfa.States[i].DTransitions.Add(State.alphabets[j], new List<DeletableTransition> { tempp });
+                    }
+                }
+            }
+            return ReDfa;
         }
-
         /// <summary>
         /// Takes a state name and return the index of it in the states list.
         /// </summary>
@@ -405,7 +589,7 @@ namespace FA
         }
         public static DFA MakeSimpleDFA(DFA FA)
         {
-
+            return new DFA(new State("sample"), new List<State> { new State("sample") });
         }
        
     }
