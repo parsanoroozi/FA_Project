@@ -187,7 +187,7 @@ namespace FA
                         find.isDeleted = true;
                         foreach (var key in RegexState.AllStates[i].DTransitions.Keys)
                         {
-                            var li = RegexState.AllStates[i]. DTransitions[key];
+                            var li = RegexState.AllStates[i].DTransitions[key];
                             for (int j = 0; j < li.Count; ++j)
                             {
                                 if (li[j].isDeleted == false)
@@ -228,13 +228,13 @@ namespace FA
         /// <summary>
         /// reset the DTransitions isDelete to false;
         /// </summary>
-        public static void Reset() 
+        public static void Reset()
         {
             int n = AllStates.Count;
             for (int i = n - 1; i >= 0; ++i)
             {
-                var keys= AllStates[i].DTransitions.Keys;
-                foreach(var st in keys)
+                var keys = AllStates[i].DTransitions.Keys;
+                foreach (var st in keys)
                 {
                     if (alphabets.Contains(st) == false)
                     {
@@ -247,7 +247,7 @@ namespace FA
                 }
 
             }
-            AllStates.RemoveAll(x=>true);
+            AllStates.RemoveAll(x => true);
         }
 
         private void FindSelfLoops()
@@ -471,8 +471,8 @@ namespace FA
         public string findRegExp()
         {
             RegexState.Regex = "";
-            foreach(var s in this.States)
-            {                
+            foreach (var s in this.States)
+            {
                 new RegexState(s);
             }
             RegexState.DeleteStates();
@@ -591,7 +591,7 @@ namespace FA
         {
             return new DFA(new State("sample"), new List<State> { new State("sample") });
         }
-       
+
     }
     class Program
     {
@@ -640,6 +640,86 @@ namespace FA
                             if (states[t].name == token[1])
                                 states[j].AddTransition(token[2], states[t]);
             }
+            Console.WriteLine();
+            NFA nfa = new NFA(states[0], states);
+            // END of Initializing...
+
+
+            bool IsThereDFA = false;
+            string input = "";
+            DFA dfa = new DFA(new State("sample") , new List<State>());
+            while (input != "8")
+            {
+                while (!(input == "1" || input == "2" || input == "3" || input == "4" || input == "5" || input == "6" || input == "7" || input == "8"))
+                {
+                    Console.WriteLine("Please enter: ");
+                    Console.WriteLine("1 for isAcceptByNFA");
+                    Console.WriteLine("2 for createEquivalentDFA");
+                    Console.WriteLine("3 for findRegExp");
+                    Console.WriteLine("4 for show Schematic(NFA)");
+                    Console.WriteLine("5 for isAcceptByDFA");
+                    Console.WriteLine("6 for makeSimpleDFA");
+                    Console.WriteLine("7 for showSchematic(DFA)");
+                    Console.WriteLine("8 for Exit");
+                    input = Console.ReadLine();
+                }
+                switch (input)
+                {
+                    case "1":
+                        Console.Write("please enter a string:   ");
+                        string s = Console.ReadLine();
+                        if (nfa.IsAcceptByFA(s))
+                            Console.WriteLine($"Yes, {s} is Accepted");
+                        else
+                            Console.WriteLine($"No, {s} is not Accepted");
+                        break;
+                    case "2":
+                        IsThereDFA = true;
+                        dfa = nfa.CreateEquivalentDFA();
+                        Console.WriteLine("DFA has been built");
+                        break;
+                    case "3":
+                        Console.WriteLine(nfa.findRegExp());
+                        break;
+                    case "4":
+                        nfa.ShowSchematicFA();
+                        break;
+                    case "5":
+                        if (IsThereDFA)
+                        {
+                            Console.Write("please enter a string:   ");
+                            s = Console.ReadLine();
+                            if (dfa.IsAcceptByFA(s))
+                                Console.WriteLine($"Yes, {s} is Accepted");
+                            else
+                                Console.WriteLine($"No, {s} is not Accepted");
+                        }
+                        else
+                            Console.WriteLine("There is no DFA yet!");
+                        break;
+                    case "6":
+                        if (IsThereDFA)
+                        {
+                            // Comming soon!
+                        }
+                        else
+                            Console.WriteLine("There is no DFA yet!");
+                        break;
+                    case "7":
+                        if (IsThereDFA)
+                        {
+                            dfa.ShowSchematicFA();
+                        }
+                        else
+                            Console.WriteLine("There is no DFA yet!");
+                        break;
+                    case "8":
+                        break;
+                }
+                if (input != "8")
+                    input = "";
+                Console.WriteLine();
+            }
 
             /*NFA nfa = new NFA(states[0], states);
             Console.WriteLine();
@@ -657,8 +737,6 @@ namespace FA
                         Console.WriteLine($"source: {nfa.States[i].name}  alphabet: {j.Key}  destination: {t.name}");
                 Console.WriteLine();
             }*/
-
-
         }
     }
 }

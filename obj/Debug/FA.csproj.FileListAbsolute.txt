@@ -11,3 +11,10 @@ C:\Users\ASUS\Desktop\university\FA\FA_Project\obj\Debug\FA.csprojAssemblyRefere
 C:\Users\ASUS\Desktop\university\FA\FA_Project\obj\Debug\FA.csproj.CoreCompileInputs.cache
 C:\Users\ASUS\Desktop\university\FA\FA_Project\obj\Debug\FA.exe
 C:\Users\ASUS\Desktop\university\FA\FA_Project\obj\Debug\FA.pdb
+C:\Users\ASUS\Desktop\university\FA\FA_Project\bin\Debug\FA.exe.config
+C:\Users\ASUS\Desktop\university\FA\FA_Project\bin\Debug\FA.exe
+C:\Users\ASUS\Desktop\university\FA\FA_Project\bin\Debug\FA.pdb
+C:\Users\ASUS\Desktop\university\FA\FA_Project\bin\Debug\AutomaticGraphLayout.dll
+C:\Users\ASUS\Desktop\university\FA\FA_Project\bin\Debug\AutomaticGraphLayout.Drawing.dll
+C:\Users\ASUS\Desktop\university\FA\FA_Project\bin\Debug\Microsoft.Msagl.GraphViewerGdi.dll
+C:\Users\ASUS\Desktop\university\FA\FA_Project\obj\Debug\FA.csproj.CopyComplete
