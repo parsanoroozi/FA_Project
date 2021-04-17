@@ -1,0 +1,11 @@
+D:\code\C#\_TLA\FA_Project\bin\Release\FA.exe.config
+D:\code\C#\_TLA\FA_Project\bin\Release\FA.exe
+D:\code\C#\_TLA\FA_Project\bin\Release\FA.pdb
+D:\code\C#\_TLA\FA_Project\bin\Release\AutomaticGraphLayout.dll
+D:\code\C#\_TLA\FA_Project\bin\Release\AutomaticGraphLayout.Drawing.dll
+D:\code\C#\_TLA\FA_Project\bin\Release\Microsoft.Msagl.GraphViewerGdi.dll
+D:\code\C#\_TLA\FA_Project\obj\Release\FA.csprojAssemblyReference.cache
+D:\code\C#\_TLA\FA_Project\obj\Release\FA.csproj.CoreCompileInputs.cache
+D:\code\C#\_TLA\FA_Project\obj\Release\FA.csproj.CopyComplete
+D:\code\C#\_TLA\FA_Project\obj\Release\FA.exe
+D:\code\C#\_TLA\FA_Project\obj\Release\FA.pdb

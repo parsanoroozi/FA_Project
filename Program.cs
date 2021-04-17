@@ -480,12 +480,14 @@ namespace FA
             RegexState.Reset();
             return reg;
         }
+        [STAThread]
         public void ShowSchematicFA()
         {
             WindowsFormsHost GraphView = new WindowsFormsHost();
             //create a form
             Form form = new Form();
             //create a viewer object
+            
             Microsoft.Msagl.GraphViewerGdi.GViewer viewer = new Microsoft.Msagl.GraphViewerGdi.GViewer();
 
             //Margin = "0,34,0,0"
@@ -527,9 +529,9 @@ namespace FA
                 init.Attr.FillColor = Color.PowderBlue;
             }
 
-            init.Attr.XRadius = 4;
-            init.Attr.YRadius = 4;
-            init.Attr.LineWidth = 10;
+            init.Attr.XRadius = 6;
+            init.Attr.YRadius = 6;
+            init.Attr.LineWidth = 2;
             if (s != null)
                 init.UserData = s;
             else
@@ -552,7 +554,7 @@ namespace FA
             }
             nod.Attr.XRadius = 5;
             nod.Attr.YRadius = 5;
-            nod.Attr.LineWidth = 10;
+            nod.Attr.LineWidth = 1;
             if (s != null)
                 nod.UserData = s;
             else
@@ -595,6 +597,7 @@ namespace FA
     }
     class Program
     {
+        [STAThread]
         static void Main(string[] args)
         {
             List<State> states = new List<State>();

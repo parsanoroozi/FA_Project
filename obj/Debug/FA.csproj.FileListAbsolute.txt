@@ -18,3 +18,7 @@ C:\Users\ASUS\Desktop\university\FA\FA_Project\bin\Debug\AutomaticGraphLayout.dl
 C:\Users\ASUS\Desktop\university\FA\FA_Project\bin\Debug\AutomaticGraphLayout.Drawing.dll
 C:\Users\ASUS\Desktop\university\FA\FA_Project\bin\Debug\Microsoft.Msagl.GraphViewerGdi.dll
 C:\Users\ASUS\Desktop\university\FA\FA_Project\obj\Debug\FA.csproj.CopyComplete
+D:\code\C#\_TLA\FA_Project\bin\Debug\AutomaticGraphLayout.dll
+D:\code\C#\_TLA\FA_Project\bin\Debug\AutomaticGraphLayout.Drawing.dll
+D:\code\C#\_TLA\FA_Project\bin\Debug\Microsoft.Msagl.GraphViewerGdi.dll
+D:\code\C#\_TLA\FA_Project\obj\Debug\FA.csproj.CopyComplete
