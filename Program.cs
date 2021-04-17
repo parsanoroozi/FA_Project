@@ -656,7 +656,7 @@ namespace FA
                     Console.WriteLine("1 for isAcceptByNFA");
                     Console.WriteLine("2 for createEquivalentDFA");
                     Console.WriteLine("3 for findRegExp");
-                    Console.WriteLine("4 for show Schematic(NFA)");
+                    Console.WriteLine("4 for showSchematic(NFA)");
                     Console.WriteLine("5 for isAcceptByDFA");
                     Console.WriteLine("6 for makeSimpleDFA");
                     Console.WriteLine("7 for showSchematic(DFA)");
