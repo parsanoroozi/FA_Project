@@ -232,7 +232,7 @@ namespace FA
         public static void Reset()
         {
             int n = AllStates.Count;
-            for (int i = n - 1; i >= 0; ++i)
+            for (int i = n - 1; i >= 0; --i)
             {
                 var keys = AllStates[i].DTransitions.Keys;
                 foreach (var st in keys)
