@@ -523,7 +523,7 @@ namespace FA
         {
             Microsoft.Msagl.Drawing.Node init = new Microsoft.Msagl.Drawing.Node(nodeName);
             init.Attr.FillColor = Color.LavenderBlush;
-            init.Attr.Shape = Shape.Triangle;
+            init.Attr.Shape = Shape.Octagon;
             if (IsFinal)
             {
                 init.Attr.AddStyle(Style.Bold);
