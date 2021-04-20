@@ -596,9 +596,123 @@ namespace FA
             return answer;
 
         }
-        public static DFA MakeSimpleDFA(DFA FA)
+        public List<List<State>> Partition(List<List<State>> P)
         {
-            return new DFA(new State("sample"), new List<State> { new State("sample") });
+            List<State> StateTemp = new List<State>();
+            List<string> groups = new List<string>();
+            List<string> Co_l = new List<string>();
+            List<List<State>> l = new List<List<State>>();
+            List<DeletableTransition> value = new List<DeletableTransition>();
+            for (int i = 0; i < P.Count; i++)
+            {
+                for (int j = 0; j < P[i].Count; j++)
+                {
+                    StateTemp.Add(P[i][j]);
+                    string tempalphabet = "";
+                    for (int t = 0; t < State.alphabets.Count; t++)
+                    {
+                        if (P[i][j].DTransitions.TryGetValue(State.alphabets[t], out value))
+                        {
+                            for (int z = 0; z < P.Count; z++)
+                            {
+                                for (int x = 0; x < P[z].Count; x++)
+                                {
+                                    if (value[0].State.name == P[z][x].name)
+                                    {
+                                        tempalphabet += z;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    groups.Add(tempalphabet);
+                }
+            }
+
+            for (int i = 0; i < StateTemp.Count; i++)
+            {
+                bool need_a_new_group = true;
+                for (int j = 0; j < Co_l.Count; j++)
+                {
+                    if (Co_l[j] == groups[i])
+                    {
+                        need_a_new_group = false;
+                        l[j].Add(StateTemp[i]);
+                        break;
+                    }
+                }
+                if (need_a_new_group)
+                {
+                    l.Add(new List<State>() { StateTemp[i] });
+                    Co_l.Add(groups[i]);
+                }
+            }
+            return l;
+        }
+        public DFA make_FA_from_partition(List<List<State>> l)
+        {
+            List<State> fa = new List<State>();
+            for (int i = 0; i < l.Count; i++)
+            {
+                State temp = new State("q" + i);
+                if (l[i][0].isFinal)
+                    temp.isFinal = true;
+                foreach (var j in l[i])
+                    if (j.isInit)
+                        temp.isInit = true;
+                fa.Add(temp);
+            }
+            List<DeletableTransition> value = new List<DeletableTransition>();
+            for (int i = 0; i < l.Count; i++)
+            {
+                for (int z = 0; z < State.alphabets.Count; z++)
+                {
+                    if (l[i][0].DTransitions.TryGetValue(State.alphabets[z], out value))
+                    {
+                        for (int j = 0; j < l.Count; j++)
+                        {
+                            for (int t = 0; t < l[j].Count; t++)
+                            {
+                                if (l[j][t].name == value[0].State.name)
+                                {
+                                    DeletableTransition temp = new DeletableTransition(new State(fa[j].name));
+                                    fa[i].DTransitions.Add(State.alphabets[z], new List<DeletableTransition>() { temp });
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            State initial = fa[0]; ;
+            for (int i = 0; i < fa.Count; i++)
+                if (fa[i].isInit)
+                    initial = fa[i];
+
+            return new DFA(initial, fa);
+        }
+        public  DFA MakeSimpleDFA(DFA FA)
+        {
+            List<List<State>> l = new List<List<State>>();
+            List<List<State>> temp = new List<List<State>>();
+            List<State> finals = new List<State>();
+            List<State> nonfinals = new List<State>();
+            foreach (var i in FA.States)
+                if (i.isFinal)
+                    finals.Add(i);
+                else
+                    nonfinals.Add(i);
+            l.Add(nonfinals);
+            l.Add(finals);
+            while (true)
+            {
+                
+                temp = Partition(l);
+                if (temp.Count == l.Count)
+                    break;
+                l = temp;
+            }
+
+            return make_FA_from_partition(l);
         }
 
     }
@@ -710,7 +824,9 @@ namespace FA
                     case "6":
                         if (IsThereDFA)
                         {
-                            // Comming soon!
+                            dfa = dfa.MakeSimpleDFA(dfa);
+                            Console.WriteLine("DFA has been minimized");
+
                         }
                         else
                             Console.WriteLine("There is no DFA yet!");
