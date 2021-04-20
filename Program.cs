@@ -141,7 +141,7 @@ namespace FA
     }
     class RegexState : State
     {
-
+        static bool finalInMade = false;
         static RegexState initial;
         static RegexState UnitedFinal;
         static List<RegexState> AllStates = new List<RegexState>();
@@ -153,8 +153,9 @@ namespace FA
 
         public RegexState(State state) : base(state.name, isInit: state.isInit)
         {
-            if (UnitedFinal == null)
+            if (UnitedFinal == null && finalInMade == false)
             {
+                finalInMade = true;
                 UnitedFinal = new RegexState(new State("FinalState"));
                 UnitedFinal.isFinal = true;
             }
@@ -170,7 +171,8 @@ namespace FA
             {
                 RegexState.initial = this;
             }
-            RegexState.AllStates.Add(this);
+            if(state.name != "FinalState")
+                RegexState.AllStates.Add(this);
         }
         public static void DeleteStates()
         {
@@ -231,22 +233,27 @@ namespace FA
         public static void Reset()
         {
             int n = AllStates.Count;
-            for (int i = n - 1; i >= 0; ++i)
+            for (int i = n - 1; i >= 0; --i)
             {
-                var keys = AllStates[i].DTransitions.Keys;
-                foreach (var st in keys)
+                List<string> ExtraKeys = new List<string>();
+               // var keys = AllStates[i].DTransitions.Keys;
+                foreach (var st in AllStates[i].DTransitions.Keys)
                 {
                     if (alphabets.Contains(st) == false)
                     {
-                        AllStates[i].DTransitions.Remove(st);
+                        //    AllStates[i].DTransitions.Remove(st);
+                        ExtraKeys.Add(st);
                     }
                     else
                     {
                         AllStates[i].DTransitions[st].ForEach(x => x.isDeleted = false);
                     }
                 }
+                foreach(var st in ExtraKeys)
+                    AllStates[i].DTransitions.Remove(st);
 
             }
+
             AllStates.RemoveAll(x => true);
         }
 
@@ -487,7 +494,7 @@ namespace FA
             //create a form
             Form form = new Form();
             //create a viewer object
-            
+
             Microsoft.Msagl.GraphViewerGdi.GViewer viewer = new Microsoft.Msagl.GraphViewerGdi.GViewer();
 
             //Margin = "0,34,0,0"
@@ -507,7 +514,7 @@ namespace FA
             {
                 foreach (string L in s.DTransitions.Keys)
                 {
-                    s.DTransitions[L].ForEach((x) => { Dfa.AddEdge(s.name, L, x.State.name); });
+                    s.DTransitions[L].ForEach((x) => { if (x.State.name != "FinalState") Dfa.AddEdge(s.name, L, x.State.name); });
                 }
             }
             viewer.Graph = Dfa;
@@ -522,7 +529,7 @@ namespace FA
         {
             Microsoft.Msagl.Drawing.Node init = new Microsoft.Msagl.Drawing.Node(nodeName);
             init.Attr.FillColor = Color.LavenderBlush;
-            init.Attr.Shape = Shape.Triangle;
+            init.Attr.Shape = Shape.Octagon;
             if (IsFinal)
             {
                 init.Attr.AddStyle(Style.Bold);
@@ -650,7 +657,7 @@ namespace FA
 
             bool IsThereDFA = false;
             string input = "";
-            DFA dfa = new DFA(new State("sample") , new List<State>());
+            DFA dfa = new DFA(new State("sample"), new List<State>());
             while (input != "8")
             {
                 while (!(input == "1" || input == "2" || input == "3" || input == "4" || input == "5" || input == "6" || input == "7" || input == "8"))
