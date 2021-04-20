@@ -141,7 +141,7 @@ namespace FA
     }
     class RegexState : State
     {
-
+        static bool finalInMade = false;
         static RegexState initial;
         static RegexState UnitedFinal;
         static List<RegexState> AllStates = new List<RegexState>();
@@ -153,8 +153,9 @@ namespace FA
 
         public RegexState(State state) : base(state.name, isInit: state.isInit)
         {
-            if (UnitedFinal == null)
+            if (UnitedFinal == null && finalInMade == false)
             {
+                finalInMade = true;
                 UnitedFinal = new RegexState(new State("FinalState"));
                 UnitedFinal.isFinal = true;
             }
@@ -487,7 +488,7 @@ namespace FA
             //create a form
             Form form = new Form();
             //create a viewer object
-            
+
             Microsoft.Msagl.GraphViewerGdi.GViewer viewer = new Microsoft.Msagl.GraphViewerGdi.GViewer();
 
             //Margin = "0,34,0,0"
@@ -650,7 +651,7 @@ namespace FA
 
             bool IsThereDFA = false;
             string input = "";
-            DFA dfa = new DFA(new State("sample") , new List<State>());
+            DFA dfa = new DFA(new State("sample"), new List<State>());
             while (input != "8")
             {
                 while (!(input == "1" || input == "2" || input == "3" || input == "4" || input == "5" || input == "6" || input == "7" || input == "8"))
