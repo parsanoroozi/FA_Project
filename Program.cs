@@ -171,7 +171,8 @@ namespace FA
             {
                 RegexState.initial = this;
             }
-            RegexState.AllStates.Add(this);
+            if(state.name != "FinalState")
+                RegexState.AllStates.Add(this);
         }
         public static void DeleteStates()
         {
@@ -234,20 +235,25 @@ namespace FA
             int n = AllStates.Count;
             for (int i = n - 1; i >= 0; --i)
             {
-                var keys = AllStates[i].DTransitions.Keys;
-                foreach (var st in keys)
+                List<string> ExtraKeys = new List<string>();
+               // var keys = AllStates[i].DTransitions.Keys;
+                foreach (var st in AllStates[i].DTransitions.Keys)
                 {
                     if (alphabets.Contains(st) == false)
                     {
-                        AllStates[i].DTransitions.Remove(st);
+                        //    AllStates[i].DTransitions.Remove(st);
+                        ExtraKeys.Add(st);
                     }
                     else
                     {
                         AllStates[i].DTransitions[st].ForEach(x => x.isDeleted = false);
                     }
                 }
+                foreach(var st in ExtraKeys)
+                    AllStates[i].DTransitions.Remove(st);
 
             }
+
             AllStates.RemoveAll(x => true);
         }
 
@@ -508,7 +514,7 @@ namespace FA
             {
                 foreach (string L in s.DTransitions.Keys)
                 {
-                    s.DTransitions[L].ForEach((x) => { Dfa.AddEdge(s.name, L, x.State.name); });
+                    s.DTransitions[L].ForEach((x) => {if(x.State.name!="FinalState") Dfa.AddEdge(s.name, L, x.State.name); })
                 }
             }
             viewer.Graph = Dfa;
