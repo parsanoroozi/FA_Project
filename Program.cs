@@ -181,14 +181,15 @@ namespace FA
                 // RegexState.AllStates[i];
                 if (RegexState.AllStates[i].isInit == false)
                 {
+                    List<DeletableTransition> ToDelete = new List<DeletableTransition>();
+
                     foreach (var B in RegexState.AllStates[i].backTransitions)//for all of this state back transitions
                     {
                         string BString = B.transition + RegexState.AllStates[i].selfRegex;
                         var Q = B.back;
                         var find = B.back.DTransitions[B.transition].Find(x => x.State.name == RegexState.AllStates[i].name);
                         if (find.isDeleted == false)
-                        {
-                            find.isDeleted = true;
+                        {                            
                             foreach (var key in RegexState.AllStates[i].DTransitions.Keys)//adding a new transition/selfLoop instead of this state
                             {
                                 var li = RegexState.AllStates[i].DTransitions[key];
@@ -196,7 +197,8 @@ namespace FA
                                 {
                                     if (li[j].isDeleted == false)
                                     {
-                                        li[j].isDeleted = true;
+                                        ToDelete.Add(li[j]);
+                                       // li[j].isDeleted = true;
                                         if (Q.name != li[j].State.name)
                                         {
                                             Q.AddTransition(BString + key, li[j].State);
@@ -208,8 +210,13 @@ namespace FA
                                     }
                                 }
                             }
+                            find.isDeleted = true;
                         }
                   
+                    }
+                    for(int k = 0; k < ToDelete.Count; ++k)
+                    {
+                        ToDelete[k].isDeleted = true;
                     }
                 }
             }
