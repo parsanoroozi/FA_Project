@@ -176,36 +176,40 @@ namespace FA
         }
         public static void DeleteStates()
         {
-            for (int i = 0; i < RegexState.AllStates.Count; i++)
+            for (int i = 0; i < RegexState.AllStates.Count; i++)//for all available states
             {
                 // RegexState.AllStates[i];
                 if (RegexState.AllStates[i].isInit == false)
                 {
-                    foreach (var B in RegexState.AllStates[i].backTransitions)
+                    foreach (var B in RegexState.AllStates[i].backTransitions)//for all of this state back transitions
                     {
                         string BString = B.transition + RegexState.AllStates[i].selfRegex;
                         var Q = B.back;
                         var find = B.back.DTransitions[B.transition].Find(x => x.State.name == RegexState.AllStates[i].name);
-                        find.isDeleted = true;
-                        foreach (var key in RegexState.AllStates[i].DTransitions.Keys)
+                        if (find.isDeleted == false)
                         {
-                            var li = RegexState.AllStates[i].DTransitions[key];
-                            for (int j = 0; j < li.Count; ++j)
+                            find.isDeleted = true;
+                            foreach (var key in RegexState.AllStates[i].DTransitions.Keys)//adding a new transition/selfLoop instead of this state
                             {
-                                if (li[j].isDeleted == false)
+                                var li = RegexState.AllStates[i].DTransitions[key];
+                                for (int j = 0; j < li.Count; ++j)
                                 {
-                                    li[j].isDeleted = true;
-                                    if (Q.name != li[j].State.name)
+                                    if (li[j].isDeleted == false)
                                     {
-                                        Q.AddTransition(BString + key, li[j].State);
-                                    }
-                                    else
-                                    {
-                                        RegexState.AllStates.Find(x => x.name == Q.name).AddToThisRegex(BString + key);
+                                        li[j].isDeleted = true;
+                                        if (Q.name != li[j].State.name)
+                                        {
+                                            Q.AddTransition(BString + key, li[j].State);
+                                        }
+                                        else
+                                        {
+                                            RegexState.AllStates.Find(x => x.name == Q.name).AddToThisRegex(BString + key);
+                                        }
                                     }
                                 }
                             }
                         }
+                  
                     }
                 }
             }
