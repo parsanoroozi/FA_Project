@@ -372,6 +372,7 @@ namespace FA
             table.Add(new ConvertionalState(name, true));
             for (int i = 0; i < table.Count; i++)
             {
+                Console.WriteLine("Doooooooooooooooooooooooooooooooooooooooooooooooooooooo");
                 for (int j = 0; j < State.alphabets.Count; j++)
                 {
                     List<State> transition = new List<State>();
