@@ -101,14 +101,21 @@ namespace FA
                 {
                     for (int j = 0; j < value.Count; j++)
                     {
-                        temp.Add(value[j]);
+                        if (value[j].State.name == this.name || value[j].State.name == s.name)
+                            temp.Add(MERGED);
+                        else
+                            temp.Add(value[j]);
+
                     }
                 }
                 if (s.DTransitions.TryGetValue(State.alphabets[i], out value1))
                 {
                     for (int j = 0; j < value1.Count; j++)
                     {
-                        temp.Add(value1[j]);
+                        if (value1[j].State.name == this.name || value1[j].State.name == s.name)
+                            temp.Add(MERGED);
+                        else
+                            temp.Add(value1[j]);
                     }
                 }
                 merged.DTransitions.Add(State.alphabets[i], temp);
@@ -123,6 +130,7 @@ namespace FA
                                 value.RemoveAt(t);
                                 value.Add(MERGED);
                             }
+
             return merged;
         }
     }
@@ -171,7 +179,7 @@ namespace FA
             {
                 RegexState.initial = this;
             }
-            if(state.name != "FinalState")
+            if (state.name != "FinalState")
                 RegexState.AllStates.Add(this);
         }
         public static void DeleteStates()
@@ -189,7 +197,7 @@ namespace FA
                         var Q = B.back;
                         var find = B.back.DTransitions[B.transition].Find(x => x.State.name == RegexState.AllStates[i].name);
                         if (find.isDeleted == false)
-                        {                            
+                        {
                             foreach (var key in RegexState.AllStates[i].DTransitions.Keys)//adding a new transition/selfLoop instead of this state
                             {
                                 var li = RegexState.AllStates[i].DTransitions[key];
@@ -198,7 +206,7 @@ namespace FA
                                     if (li[j].isDeleted == false)
                                     {
                                         ToDelete.Add(li[j]);
-                                       // li[j].isDeleted = true;
+                                        // li[j].isDeleted = true;
                                         if (Q.name != li[j].State.name)
                                         {
                                             Q.AddTransition(BString + key, li[j].State);
@@ -212,9 +220,9 @@ namespace FA
                             }
                             find.isDeleted = true;
                         }
-                  
+
                     }
-                    for(int k = 0; k < ToDelete.Count; ++k)
+                    for (int k = 0; k < ToDelete.Count; ++k)
                     {
                         ToDelete[k].isDeleted = true;
                     }
@@ -247,7 +255,7 @@ namespace FA
             for (int i = n - 1; i >= 0; --i)
             {
                 List<string> ExtraKeys = new List<string>();
-               // var keys = AllStates[i].DTransitions.Keys;
+                // var keys = AllStates[i].DTransitions.Keys;
                 foreach (var st in AllStates[i].DTransitions.Keys)
                 {
                     if (alphabets.Contains(st) == false)
@@ -260,7 +268,7 @@ namespace FA
                         AllStates[i].DTransitions[st].ForEach(x => x.isDeleted = false);
                     }
                 }
-                foreach(var st in ExtraKeys)
+                foreach (var st in ExtraKeys)
                     AllStates[i].DTransitions.Remove(st);
 
             }
@@ -383,6 +391,7 @@ namespace FA
             table.Add(new ConvertionalState(name, true));
             for (int i = 0; i < table.Count; i++)
             {
+
                 for (int j = 0; j < State.alphabets.Count; j++)
                 {
                     List<State> transition = new List<State>();
@@ -391,7 +400,17 @@ namespace FA
                         if (table[i].name[t].DTransitions.TryGetValue(State.alphabets[j], out List<DeletableTransition> value))
                         {
                             for (int z = 0; z < value.Count; z++)
-                                transition.Add(value[z].State);
+                            {
+                                bool Its_new = true;
+                                for (int x = 0; x < transition.Count; x++)
+                                {
+                                    if (value[z].State.name == transition[x].name)
+                                        Its_new = false;
+                                }
+                                if (Its_new)
+                                    transition.Add(value[z].State);
+                            }
+
                         }
                     }
                     if (transition.Count == 0)
@@ -414,8 +433,41 @@ namespace FA
                             for (int t = 0; t < table.Count; t++)
                             {
                                 string tempname = "";
+                                List<char> c = new List<char>();
                                 for (int z = 0; z < table[t].name.Count; z++)
+                                {
                                     tempname += table[t].name[z].name;
+                                }
+                                for (int z = 0; z < tempname.Length; z++)
+                                    c.Add(tempname[z]);
+
+                                for (int z = 0; z < c.Count; z++)
+                                    for (int x = z; x < c.Count; x++)
+                                        if (c[z] < c[x])
+                                        {
+                                            char s = c[z];
+                                            c[z] = c[x];
+                                            c[x] = s;
+                                        }
+                                tempname = "";
+                                for (int z = 0; z < c.Count; z++)
+                                    tempname += c[z];
+
+                                c = new List<char>();
+                                for (int z = 0; z < Value.Length; z++)
+                                    c.Add(Value[z]);
+                                for (int z = 0; z < c.Count; z++)
+                                    for (int x = z; x < c.Count; x++)
+                                        if (c[z] < c[x])
+                                        {
+                                            char s = c[z];
+                                            c[z] = c[x];
+                                            c[x] = s;
+                                        }
+                                Value = "";
+                                for (int z = 0; z < c.Count; z++)
+                                    Value += c[z];
+
                                 if (tempname == Value)
                                 {
                                     flag = true;
@@ -701,7 +753,7 @@ namespace FA
 
             return new DFA(initial, fa);
         }
-        public  DFA MakeSimpleDFA(DFA FA)
+        public DFA MakeSimpleDFA(DFA FA)
         {
             List<List<State>> l = new List<List<State>>();
             List<List<State>> temp = new List<List<State>>();
@@ -716,7 +768,7 @@ namespace FA
             l.Add(finals);
             while (true)
             {
-                
+
                 temp = Partition(l);
                 if (temp.Count == l.Count)
                     break;
